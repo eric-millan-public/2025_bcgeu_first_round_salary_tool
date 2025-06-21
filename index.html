@@ -3,22 +3,22 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>BCGEU Salary Tool</title>
+  <title>BCGEU Wage Increase Calculator</title>
   <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
   <div class="container">
-    <h1>BCGEU First Round Salary Tool</h1>
-    <label for="valueSelector">Select a value:</label>
-    <select id="valueSelector">
-      <option value="1">1</option>
-      <option value="2">2</option>
-      <option value="3">3</option>
-      <option value="4">4</option>
-    </select>
+    <h1>BCGEU First Round Wage Increase Tool</h1>
 
-    <p id="equationDisplay">Equation: 1 + 1 = 2</p>
+    <label for="positionSelector">Select your position:</label>
+    <select id="positionSelector"></select>
+
+    <div id="summary">
+      <p><strong>Initial Wage:</strong> $<span id="initialWage">--</span>/hr</p>
+      <p><strong>New Wage:</strong> $<span id="newWage">--</span>/hr</p>
+      <p><strong>Total Increase:</strong> $<span id="dollarIncrease">--</span> (<span id="percentIncrease">--</span>%)</p>
+    </div>
 
     <canvas id="myChart" width="400" height="200"></canvas>
   </div>
