@@ -6,7 +6,36 @@ const newWageDisplay = document.getElementById('newWage');
 const dollarIncreaseDisplay = document.getElementById('dollarIncrease');
 const percentIncreaseDisplay = document.getElementById('percentIncrease');
 
-// === Raise History (most recent first, for back-calculation) ===
+// === BC Inflation Rates (actual CPI % for each year to 2024) ===
+const bcInflationRates = [
+  { year: 2000, rate: 1.8 },
+  { year: 2001, rate: 1.7 },
+  { year: 2002, rate: 2.4 },
+  { year: 2003, rate: 2.2 },
+  { year: 2004, rate: 2.0 },
+  { year: 2005, rate: 2.0 },
+  { year: 2006, rate: 1.7 },
+  { year: 2007, rate: 1.8 },
+  { year: 2008, rate: 2.1 },
+  { year: 2009, rate: 0.0 },
+  { year: 2010, rate: 1.3 },
+  { year: 2011, rate: 2.4 },
+  { year: 2012, rate: 1.1 },
+  { year: 2013, rate: -0.1 },
+  { year: 2014, rate: 1.0 },
+  { year: 2015, rate: 1.1 },
+  { year: 2016, rate: 1.8 },
+  { year: 2017, rate: 2.1 },
+  { year: 2018, rate: 2.7 },
+  { year: 2019, rate: 2.3 },
+  { year: 2020, rate: 0.8 },
+  { year: 2021, rate: 2.8 },
+  { year: 2022, rate: 6.9 },
+  { year: 2023, rate: 3.9 },
+  { year: 2024, rate: 2.6 }
+];
+
+// === Raise History used for reconstructing actual past wages ===
 const raiseHistory = [
   { year: 2024, pct: 3.0 },
   { year: 2023, pct: 6.75 },
@@ -35,27 +64,7 @@ const raiseHistory = [
   { year: 2000, pct: 2.4 }
 ];
 
-// === Future Offer: 4 raises (0.5% + $0.15, 0.5% + $0.15, 1%, 1%) ===
-function calculateFutureWages(currentWage) {
-  let future = [];
-  let wage = currentWage;
-
-  wage = wage * 1.005 + 0.15; // 6 months in
-  future.push({ year: 2025.0, wage: parseFloat(wage.toFixed(2)) });
-
-  wage = wage * 1.005 + 0.15; // 12 months in
-  future.push({ year: 2025.5, wage: parseFloat(wage.toFixed(2)) });
-
-  wage = wage * 1.01; // 18 months
-  future.push({ year: 2026.0, wage: parseFloat(wage.toFixed(2)) });
-
-  wage = wage * 1.01; // 24 months
-  future.push({ year: 2026.5, wage: parseFloat(wage.toFixed(2)) });
-
-  return future;
-}
-
-// === Back-calculate historical wages from latest wage ===
+// === Compute real wage history based on a known 2024 value ===
 function backCalculateWages(latestWage) {
   let wages = [];
   let currentWage = latestWage;
@@ -67,6 +76,40 @@ function backCalculateWages(latestWage) {
   }
 
   return wages;
+}
+
+// === Forward project wages using 4-step offer ===
+function calculateFutureWages(currentWage) {
+  let future = [];
+  let wage = currentWage;
+
+  wage = wage * 1.005 + 0.15; // 2025.0
+  future.push({ year: 2025.0, wage: parseFloat(wage.toFixed(2)) });
+
+  wage = wage * 1.005 + 0.15; // 2025.5
+  future.push({ year: 2025.5, wage: parseFloat(wage.toFixed(2)) });
+
+  wage = wage * 1.01; // 2026.0
+  future.push({ year: 2026.0, wage: parseFloat(wage.toFixed(2)) });
+
+  wage = wage * 1.01; // 2026.5
+  future.push({ year: 2026.5, wage: parseFloat(wage.toFixed(2)) });
+
+  return future;
+}
+
+// === Build inflation multipliers from each year to 2024 ===
+function buildInflationMultipliers() {
+  const multipliers = {};
+  let factor = 1.0;
+
+  for (let i = bcInflationRates.length - 1; i >= 0; i--) {
+    const { year, rate } = bcInflationRates[i];
+    multipliers[year] = factor;
+    factor *= 1 + rate / 100;
+  }
+
+  return multipliers;
 }
 
 // === Chart Setup ===
@@ -100,45 +143,29 @@ let wageChart = new Chart(ctx, {
   }
 });
 
-// === Update All Displays ===
+// === Main Update ===
 function updateDisplay() {
   const currentWage = parseFloat(wageSlider.value);
   sliderValueDisplay.textContent = currentWage.toFixed(2);
 
-  // Back-calculate past wages and future offers
   const pastWages = backCalculateWages(currentWage);
   const futureWages = calculateFutureWages(currentWage);
-
-  // Merge time series
   const combined = [...pastWages, ...futureWages];
 
-  // Extract values
   const years = combined.map(e => e.year);
-  const wages = combined.map(e => e.wage);
+  const rawWages = combined.map(e => e.wage);
+
+  // Inflation-adjusted values to 2024 dollars
+  const multipliers = buildInflationMultipliers();
+  const adjustedWages = combined.map(({ year, wage }) => {
+    const m = multipliers[year] ?? 1;
+    return parseFloat((wage * m).toFixed(2));
+  });
 
   // Update chart
   wageChart.data.labels = years;
-  wageChart.data.datasets = [{
-    label: "Adjusted Wage Over Time",
-    data: wages,
-    borderColor: '#4caf50',
-    backgroundColor: 'rgba(76, 175, 80, 0.1)',
-    tension: 0.1
-  }];
-  wageChart.update();
+  wageChart.data.datasets = [
+    {
+      label: "Act
 
-  // Summary
-  const finalWage = futureWages[futureWages.length - 1].wage;
-  const dollarIncrease = (finalWage - currentWage).toFixed(2);
-  const percentIncrease = (((finalWage - currentWage) / currentWage) * 100).toFixed(2);
-
-  initialWageDisplay.textContent = currentWage.toFixed(2);
-  newWageDisplay.textContent = finalWage.toFixed(2);
-  dollarIncreaseDisplay.textContent = dollarIncrease;
-  percentIncreaseDisplay.textContent = percentIncrease;
-}
-
-// === Initialize ===
-wageSlider.addEventListener('input', updateDisplay);
-updateDisplay();
 
