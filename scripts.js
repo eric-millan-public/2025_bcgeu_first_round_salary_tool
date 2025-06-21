@@ -166,6 +166,35 @@ function updateDisplay() {
   wageChart.data.labels = years;
   wageChart.data.datasets = [
     {
-      label: "Act
+      label: "Actual Wage Over Time",
+      data: rawWages,
+      borderColor: '#4caf50',
+      backgroundColor: 'rgba(76, 175, 80, 0.1)',
+      tension: 0.1
+    },
+    {
+      label: "Wage in 2024 Dollars (Purchasing Power)",
+      data: adjustedWages,
+      borderColor: '#2196f3',
+      backgroundColor: 'rgba(33, 150, 243, 0.1)',
+      borderDash: [5, 5],
+      tension: 0.1
+    }
+  ];
+  wageChart.update();
 
+  // Update summary
+  const finalWage = futureWages[futureWages.length - 1].wage;
+  const dollarIncrease = (finalWage - currentWage).toFixed(2);
+  const percentIncrease = (((finalWage - currentWage) / currentWage) * 100).toFixed(2);
+
+  initialWageDisplay.textContent = currentWage.toFixed(2);
+  newWageDisplay.textContent = finalWage.toFixed(2);
+  dollarIncreaseDisplay.textContent = dollarIncrease;
+  percentIncreaseDisplay.textContent = percentIncrease;
+}
+
+// === Initialize ===
+wageSlider.addEventListener('input', updateDisplay);
+updateDisplay();
 
