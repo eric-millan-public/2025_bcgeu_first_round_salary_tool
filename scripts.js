@@ -5,6 +5,7 @@ const initialWageDisplay = document.getElementById('initialWage');
 const newWageDisplay = document.getElementById('newWage');
 const dollarIncreaseDisplay = document.getElementById('dollarIncrease');
 const percentIncreaseDisplay = document.getElementById('percentIncrease');
+const test_elem = document.getElementByID('test_elem');
 
 // === BC Inflation Rates (actual CPI % for each year to 2024) ===
 const bcInflationRates = [
@@ -187,6 +188,7 @@ function updateDisplay() {
   const finalWage = futureWages[futureWages.length - 1].wage;
   const dollarIncrease = (finalWage - currentWage).toFixed(2);
   const percentIncrease = (((finalWage - currentWage) / currentWage) * 100).toFixed(2);
+  const test_elem = 1
 
   initialWageDisplay.textContent = currentWage.toFixed(2);
   newWageDisplay.textContent = finalWage.toFixed(2);
