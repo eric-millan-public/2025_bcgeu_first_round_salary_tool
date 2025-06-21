@@ -126,11 +126,13 @@ function updateDisplay() {
   ];
   wageChart.update();
 
+  // Get wage from 2020 directly from pastWages
+  const wage2020 = pastWages.find(e => e.year === 2020)?.wage;
+
   // Summary values
   const finalWage = futureWages[futureWages.length - 1].wage;
   const dollarIncrease = (finalWage - currentWage).toFixed(2);
   const percentIncrease = (((finalWage - currentWage) / currentWage) * 100).toFixed(2);
-  const wage2020 = pastWages.find(e => e.year === 2020)?.wage;
 
   initialWageDisplay.textContent = currentWage.toFixed(2);
   newWageDisplay.textContent = finalWage.toFixed(2);
