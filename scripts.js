@@ -43,12 +43,14 @@ function backCalculateWages(latestWage) {
 
   for (let i = 0; i < raiseHistory.length; i++) {
     const { year, pct } = raiseHistory[i];
-    wages.unshift({ year, wage: parseFloat(currentWage.toFixed(2)) });
-    currentWage = currentWage / (1 + pct / 100);
+    currentWage = currentWage / (1 + pct / 100); // Step 1: reverse the raise
+    wages.unshift({ year, wage: parseFloat(currentWage.toFixed(2)) }); // Step 2: store it
   }
 
+  wages.push({ year: 2024, wage: parseFloat(latestWage.toFixed(2)) }); // Ensure 2024 is accurate
   return wages;
 }
+
 
 // === Forward project future wages based on offer ===
 function calculateFutureWages(currentWage) {
