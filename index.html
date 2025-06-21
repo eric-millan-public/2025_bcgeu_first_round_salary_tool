@@ -3,19 +3,25 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Simple Dropdown Chart</title>
+  <title>BCGEU Salary Tool</title>
+  <link rel="stylesheet" href="styles.css">
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 </head>
 <body>
-  <h2>Select a value:</h2>
-  <select id="valueSelector">
-    <option value="1">1</option>
-    <option value="2">2</option>
-    <option value="3">3</option>
-    <option value="4">4</option>
-  </select>
+  <div class="container">
+    <h1>BCGEU First Round Salary Tool</h1>
+    <label for="valueSelector">Select a value:</label>
+    <select id="valueSelector">
+      <option value="1">1</option>
+      <option value="2">2</option>
+      <option value="3">3</option>
+      <option value="4">4</option>
+    </select>
 
-  <canvas id="myChart" width="400" height="200"></canvas>
+    <p id="equationDisplay">Equation: 1 + 1 = 2</p>
+
+    <canvas id="myChart" width="400" height="200"></canvas>
+  </div>
 
   <script src="scripts.js"></script>
 </body>
